@@ -1,7 +1,7 @@
 // Your code here
 var questionsArr=[
     {
-        question: 'Which one of these characters is not friends with Harry Potter?',
+        question: 'Which one of these characters is NOT friends with Harry Potter?',
         answer: 'Draco Malfoy',
         options:[
             'Ron Weasley',
@@ -63,38 +63,87 @@ var questionsArr=[
 ]
 
 var quiz = document.getElementById('quiz');
+
+document.body.onload=createStartButton;
+
 function createStartButton(){
     var buttonText=document.createTextNode("Start Quiz!")
     var startButton=document.createElement("button")
     startButton.appendChild(buttonText);
     startButton.setAttribute('id', 'start-quiz')
     quiz.appendChild(startButton)
+    localStorage.setItem(PREVIOUS_SCORE, score)
 }
-document.body.onload=createStartButton;
-
-var score
 
 quiz.addEventListener('click', function(e){
-    if (e.target.id='start-quiz') {
-        for (let i = 0; i < questionsArr.length; i++) {
-            var question=questionsArr[i].question
-            var options=questionsArr[i].options
-            var answer=questionsArr[i].answer
-            console.log(answer)
-            var questionText=document.createTextNode(question);
-            var questionEl=document.createElement('p')
-            var optionDivEl=document.createElement('div')
-            questionEl.appendChild(questionText)
-            for (let j = 0; j < options.length; j++) {
-                var optionText=document.createTextNode(options[j])
-                var optionButton=document.createElement('button')
-                optionButton.appendChild(optionText)
-                optionDivEl.appendChild(optionButton)
-                console.log(optionDivEl);
+    e.stopPropagation()
+    if (e.target.id==='start-quiz') {
+        var intervalId = setInterval(() => {
+            if (timer == -1) {
+                clearInterval(intervalId);
+            } else{
+                timerText.textContent=timer
+                quiz.appendChild(timerText)
+                timer--
             }
-            quiz.appendChild(questionEl)
-            quiz.appendChild(optionDivEl)
-            break;
-        }
+        }, 1000);
+        startQuiz(option);
+    }
+    if (e.target===document.querySelector('#quiz > div > button')){
+        option++
+        nextQuestion(option)
+        console.log(option);
     }
 })
+
+var timer= 10;
+var timerText=document.createElement('p')
+var quizQuestion=0
+var questionEl=document.createElement('p')
+var optionDivEl=document.createElement('div')
+var option=0
+var questionText
+var question
+var options
+var quizAnswer
+
+//Start quiz game
+function startQuiz(option){
+    question=questionsArr[option].question
+    options=questionsArr[option].options
+    quizAnswer=questionsArr[option].answer
+    questionText=document.createTextNode(question);
+    questionEl.appendChild(questionText)
+    for (let j = 0; j < options.length; j++) {
+        var optionText=document.createTextNode(options[j])
+        var optionButton=document.createElement('button')
+        optionButton.appendChild(optionText)
+        optionDivEl.appendChild(optionButton)
+    }
+    quiz.appendChild(questionEl);
+    quiz.appendChild(optionDivEl);
+}
+
+//New Question
+function nextQuestion(option){
+    questionEl.textContent=''
+    optionDivEl.textContent=''
+    question=questionsArr[option].question
+    options=questionsArr[option].options
+    quizAnswer=questionsArr[option].answer
+    questionEl.textContent=question
+
+}
+
+//local storage code
+var score=10
+var PREVIOUS_SCORE = 'previous-score'
+var previousScore = localStorage.getItem(PREVIOUS_SCORE)
+if (previousScore) {
+    psText=document.createTextNode("Previous Score: " +previousScore)
+    psP=document.createElement('p')
+    psP.appendChild(psText)
+    quiz.appendChild(psP)
+}
+
+
