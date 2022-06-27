@@ -42,12 +42,12 @@ var questionsArr=[
     },
     {
         question: 'In Men and Black, what are the two FBI agents hunting?',
-        answer: 'aliens',
+        answer: 'Aliens',
         options:[
-            'serial killers',
-            'ghosts',
-            'aliens',
-            'time travelers'
+            'Serial killers',
+            'Ghosts',
+            'Aliens',
+            'Time travelers'
         ]
     },
     {
@@ -63,87 +63,117 @@ var questionsArr=[
 ]
 
 var quiz = document.getElementById('quiz');
+var seconds= 5;
+var timerText=document.createElement('p')
+var quizQuestion=0
+var questionEl=document.createElement('p')
+var optionDivEl=document.createElement('div')
+var option
+var questionText
+var question
+var choices
+var quizAnswer
+var score=0
+var intervalId
+var startButton
 
-document.body.onload=createStartButton;
+//load start button
+createStartButton();
 
 function createStartButton(){
     var buttonText=document.createTextNode("Start Quiz!")
-    var startButton=document.createElement("button")
+    startButton=document.createElement("button")
     startButton.appendChild(buttonText);
     startButton.setAttribute('id', 'start-quiz')
     quiz.appendChild(startButton)
-    localStorage.setItem(PREVIOUS_SCORE, score)
+}
+function removeStartButton(){
+    quiz.removeChild(startButton)
 }
 
 quiz.addEventListener('click', function(e){
     e.stopPropagation()
     if (e.target.id==='start-quiz') {
-        var intervalId = setInterval(() => {
-            if (timer == -1) {
-                clearInterval(intervalId);
-            } else{
-                timerText.textContent=timer
-                quiz.appendChild(timerText)
-                timer--
-            }
-        }, 1000);
-        startQuiz(option);
+        removeStartButton()
+        option=0
+        questionText=document.createTextNode(question);
+        questionEl.appendChild(questionText)
+        quiz.appendChild(questionEl);
+        quiz.appendChild(optionDivEl);
+        startTimer(seconds);
+        newQuestion(option);
     }
-    if (e.target===document.querySelector('#quiz > div > button')){
+    else if(e.target.textContent===quizAnswer){
+        score++
         option++
-        nextQuestion(option)
-        console.log(option);
+        clearInterval(intervalId);
+        startTimer(seconds)
+        newQuestion(option);
+    }
+    else{
+        option++
+        clearInterval(intervalId);
+        startTimer(seconds)
+        newQuestion(option);
     }
 })
 
-var timer= 10;
-var timerText=document.createElement('p')
-var quizQuestion=0
-var questionEl=document.createElement('p')
-var optionDivEl=document.createElement('div')
-var option=0
-var questionText
-var question
-var options
-var quizAnswer
+//Timer
+function startTimer(seconds){
+    let counter = seconds;
+    intervalId = setInterval(() => {
+        if (counter == -1) {
+            clearInterval(intervalId);
+            option++
+            newQuestion(option)
+            startTimer(seconds)
+        } else{
+            timerText.textContent=counter
+            quiz.appendChild(timerText)
+            counter--
+        }
+    }, 1000);
+}
 
-//Start quiz game
-function startQuiz(option){
-    question=questionsArr[option].question
-    options=questionsArr[option].options
-    quizAnswer=questionsArr[option].answer
-    questionText=document.createTextNode(question);
-    questionEl.appendChild(questionText)
-    for (let j = 0; j < options.length; j++) {
-        var optionText=document.createTextNode(options[j])
-        var optionButton=document.createElement('button')
-        optionButton.appendChild(optionText)
-        optionDivEl.appendChild(optionButton)
+//Get Question
+function newQuestion(option){
+    //end of quiz option
+    if (option>=questionsArr.length) {
+        quiz.removeChild(optionDivEl)
+        quiz.removeChild(questionEl)
+        quiz.removeChild(timerText);
+        clearInterval(intervalId);
+        createStartButton();
+        score=Math.round((score/questionsArr.length)*100); 
+        localStorage.setItem(PREVIOUS_SCORE, score)
     }
-    quiz.appendChild(questionEl);
-    quiz.appendChild(optionDivEl);
+    else{
+        questionEl.textContent=''
+        optionDivEl.textContent=''
+        question=questionsArr[option].question
+        choices=questionsArr[option].options
+        quizAnswer=questionsArr[option].answer
+        questionEl.textContent=question
+        for (let j = 0; j < choices.length; j++) {
+            var optionText=document.createTextNode(choices[j])
+            var optionButton=document.createElement('button')
+            optionButton.appendChild(optionText)
+            optionDivEl.appendChild(optionButton)
+        }
+    }
+    
 }
 
-//New Question
-function nextQuestion(option){
-    questionEl.textContent=''
-    optionDivEl.textContent=''
-    question=questionsArr[option].question
-    options=questionsArr[option].options
-    quizAnswer=questionsArr[option].answer
-    questionEl.textContent=question
-
-}
 
 //local storage code
-var score=10
 var PREVIOUS_SCORE = 'previous-score'
 var previousScore = localStorage.getItem(PREVIOUS_SCORE)
+var prevScoreText= document.createTextNode("Previous Score: " +previousScore)
+var prevScoreEl=document.createElement('p')
+
 if (previousScore) {
-    psText=document.createTextNode("Previous Score: " +previousScore)
-    psP=document.createElement('p')
-    psP.appendChild(psText)
-    quiz.appendChild(psP)
+    prevScoreEl.appendChild(prevScoreText)
+    quiz.appendChild(prevScoreEl)
 }
 
 
