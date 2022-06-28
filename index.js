@@ -63,7 +63,7 @@ var questionsArr=[
 ]
 
 var quiz = document.getElementById('quiz');
-var seconds= 5;
+var seconds= 30;
 var timerText=document.createElement('p')
 var quizQuestion=0
 var questionEl=document.createElement('p')
@@ -96,6 +96,7 @@ quiz.addEventListener('click', function(e){
     if (e.target.id==='start-quiz') {
         removeStartButton()
         option=0
+        score=0
         questionText=document.createTextNode(question);
         questionEl.appendChild(questionText)
         quiz.appendChild(questionEl);
@@ -121,20 +122,20 @@ quiz.addEventListener('click', function(e){
 //Timer
 function startTimer(seconds){
     let counter = seconds;
+    timerText.textContent=counter
+    quiz.appendChild(timerText)
     intervalId = setInterval(() => {
-        if (counter == -1) {
+        if (counter == 0) {
             clearInterval(intervalId);
             option++
             newQuestion(option)
             startTimer(seconds)
         } else{
-            timerText.textContent=counter
-            quiz.appendChild(timerText)
             counter--
+            timerText.textContent=counter
         }
     }, 1000);
 }
-
 //Get Question
 function newQuestion(option){
     //end of quiz option
@@ -144,8 +145,10 @@ function newQuestion(option){
         quiz.removeChild(timerText);
         clearInterval(intervalId);
         createStartButton();
-        score=Math.round((score/questionsArr.length)*100); 
+        score=Math.round((score/questionsArr.length)*100);
         localStorage.setItem(PREVIOUS_SCORE, score)
+        quiz.appendChild(prevScoreEl)
+        prevScoreEl.textContent="Previous Score: "+score+"%"
     }
     else{
         questionEl.textContent=''
@@ -161,19 +164,17 @@ function newQuestion(option){
             optionDivEl.appendChild(optionButton)
         }
     }
-    
 }
 
 
-//local storage code
+//Local storage code
 var PREVIOUS_SCORE = 'previous-score'
-var previousScore = localStorage.getItem(PREVIOUS_SCORE)
-var prevScoreText= document.createTextNode("Previous Score: " +previousScore)
 var prevScoreEl=document.createElement('p')
+var previousScore = localStorage.getItem(PREVIOUS_SCORE)
 
 if (previousScore) {
-    prevScoreEl.appendChild(prevScoreText)
     quiz.appendChild(prevScoreEl)
+    prevScoreEl.textContent="Previous Score: "+previousScore+"%"
 }
 
 
