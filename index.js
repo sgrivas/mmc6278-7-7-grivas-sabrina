@@ -111,7 +111,8 @@ quiz.addEventListener('click', function(e){
         startTimer(seconds)
         newQuestion(option);
     }
-    else{
+
+    else if(e.target.tagName==='BUTTON' && !(e.target.id==='start-quiz')){
         option++
         clearInterval(intervalId);
         startTimer(seconds)
